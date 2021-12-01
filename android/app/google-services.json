@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "601478934234",
+    "project_id": "zw-co-smartcitytraveller",
+    "storage_bucket": "zw-co-smartcitytraveller.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:601478934234:android:491c42a5cba0dda9607fe3",
+        "android_client_info": {
+          "package_name": "zw.co.smartcitytraveller.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "601478934234-v0rfumumddnmf0ir4vnb25ac7fukim6m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBztkvRkvFJ4JfS4HPtLzIlVDOfYJv7FxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "601478934234-v0rfumumddnmf0ir4vnb25ac7fukim6m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
