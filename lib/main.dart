@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:sms_autofill/sms_autofill.dart';
+import 'package:flutter_signin_button/button_builder.dart';
+import 'package:smart_city_traveller/register_page.dart';
+import 'package:smart_city_traveller/signin_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,123 +81,58 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _smsController = TextEditingController();
 
-  String? _verificationId;
-  final SmsAutoFill _autoFill = SmsAutoFill();
-
-  void showSnackBar(String message) {
-    _scaffoldKey.currentState!.showSnackBar(SnackBar(content: Text(message)));
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Firebase Example App',
+      theme: ThemeData.dark(),
+      home: Scaffold(
+        body: AuthTypeSelector(),
+      ),
+    );
   }
+}
 
-  void verifyPhoneNumber() async {
-    PhoneVerificationCompleted verificationCompleted =
-        (phoneAuthCredential) async {
-      await _auth.signInWithCredential(phoneAuthCredential);
-      showSnackBar(
-          "Phone number automatically verified and user signed in: ${_auth.currentUser!.uid}");
-    };
-    //Listens for errors with verification, such as too many attempts
-    PhoneVerificationFailed verificationFailed =
-        (FirebaseAuthException authException) {
-      showSnackBar(
-          'Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
-    };
-    //Callback for when the code is sent
-    PhoneCodeSent codeSent =
-        (String verificationId, [int? forceResendingToken]) async {
-      showSnackBar('Please check your phone for the verification code.');
-      _verificationId = verificationId;
-    } as PhoneCodeSent;
-    PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
-        (String verificationId) {
-      showSnackBar("verification code: " + verificationId);
-      _verificationId = verificationId;
-    };
-    try {
-      await _auth.verifyPhoneNumber(
-          phoneNumber: _phoneNumberController.text,
-          timeout: const Duration(seconds: 5),
-          verificationCompleted: verificationCompleted,
-          verificationFailed: verificationFailed,
-          codeSent: codeSent,
-          codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
-    } catch (e) {
-      showSnackBar("Failed to Verify Phone Number: ${e}");
-    }
-  }
-
-  void signInWithPhoneNumber() async {
-    try {
-      final AuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: _verificationId!,
-        smsCode: _smsController.text,
-      );
-
-      final User? user = (await _auth.signInWithCredential(credential)).user;
-
-      showSnackBar("Successfully signed in UID: ${user!.uid}");
-    } catch (e) {
-      showSnackBar("Failed to sign in: " + e.toString());
-    }
+/// Provides a UI to select a authentication type page
+class AuthTypeSelector extends StatelessWidget {
+  // Navigates to a new page
+  void _pushPage(BuildContext context, Widget page) {
+    Navigator.of(context) /*!*/ .push(
+      MaterialPageRoute<void>(builder: (_) => page),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        key: _scaffoldKey,
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  TextFormField(
-                    controller: _phoneNumberController,
-                    decoration: const InputDecoration(
-                        labelText: 'Phone number (+xx xxx-xxx-xxxx)'),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    alignment: Alignment.center,
-                    child: RaisedButton(
-                        child: const Text("Get current number"),
-                        onPressed: () async => {
-                              _phoneNumberController.text =
-                                  (await _autoFill.hint)!
-                            },
-                        color: Colors.greenAccent[700]),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    alignment: Alignment.center,
-                    child: RaisedButton(
-                      color: Colors.greenAccent[400],
-                      child: const Text("Verify Number"),
-                      onPressed: () async {
-                        verifyPhoneNumber();
-                      },
-                    ),
-                  ),
-                  TextFormField(
-                    controller: _smsController,
-                    decoration:
-                        const InputDecoration(labelText: 'Verification code'),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    alignment: Alignment.center,
-                    child: RaisedButton(
-                        color: Colors.greenAccent[200],
-                        onPressed: () async {
-                          signInWithPhoneNumber();
-                        },
-                        child: const Text("Sign in")),
-                  ),
-                ],
-              )),
-        ));
+      appBar: AppBar(
+        title: const Text('Firebase Example App'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.center,
+            child: SignInButtonBuilder(
+              icon: Icons.person_add,
+              backgroundColor: Colors.indigo,
+              text: 'Registration',
+              onPressed: () => _pushPage(context, RegisterPage()),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.center,
+            child: SignInButtonBuilder(
+              icon: Icons.verified_user,
+              backgroundColor: Colors.orange,
+              text: 'Sign In',
+              onPressed: () => _pushPage(context, SignInPage()),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
